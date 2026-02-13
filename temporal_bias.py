@@ -21,17 +21,6 @@ FIG_DIR = "figs/figs_content_age"
 os.makedirs(FIG_DIR, exist_ok=True)
 
 # Plot Styling
-plt.style.use('ggplot')
-plt.rcParams.update({
-    'font.size': 12,
-    'figure.figsize': (10, 6),
-    'axes.spines.right': False,
-    'axes.spines.top': False,
-    'figure.facecolor': 'white',
-    'axes.facecolor': 'white',
-    'savefig.facecolor': 'white',
-    'savefig.transparent': False
-})
 
 # =============================================================================
 # CORE LOGIC
