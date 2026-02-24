@@ -4,6 +4,8 @@ This repository contains Python scripts for analyzing the output of social netwo
 
 ## Core Analyses
 
+[UNDER CURRENT UPDATE]
+
 This project performs two primary analyses on simulation data from Barabási-Albert (BA) and Erdős-Rényi (ER) networks using 'Follow' (F) and 'Random-Content' (RC) recommendation systems.
 
 1.  **Recommendations vs. Author Degree (`rec_vs_degree.py`)**
