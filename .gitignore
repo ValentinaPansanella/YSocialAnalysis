@@ -12,7 +12,8 @@ env/
 
 # --- Data Folders (The heavy stuff) ---
 # Ignore the raw experiment data folders
-experiments_recsys/
+old_data/
+data/
 
 # Ignore processed data pickles
 processed_data/
@@ -24,6 +25,7 @@ processed_data/
 *.zip
 
 # --- Generated Figures (Optional: keep if you want to show results, ignore if they are too many) ---
+old_figs/
 figs/
 # figs_analysis/
 # figs_content_age/
