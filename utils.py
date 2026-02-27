@@ -4,13 +4,18 @@ import pandas as pd
 import numpy as np
 import sqlite3
 
-BASE_DIR = "experiments_recsys"
-NETWORKS = ['BA', 'ER']
-RECSYSS = ['F', 'RC']
-RUNS = list(range(10))
+# BASE_DIR = "data"
+# NETWORKS = ['BA', 'ER']
+# RECSYSS = ['F', 'RC']
+# RUNS = list(range(10))
 
 def get_db_path(base_dir, network, recsys, run):
-    return os.path.join(base_dir, f"{network}_{recsys}_{run}", "database_server.db")
+    if base_dir == 'data':
+        return os.path.join(base_dir, f"{network}_{recsys}_{run}.db")
+    elif base_dir == 'old_data':
+        return os.path.join(base_dir, f"{network}_{recsys}_{run}", "database_server.db")
+    else:
+        raise ValueError(f"Unknown base_dir: {base_dir}")
 
 def get_cache_path(base_dir, network, recsys, run):
     cache_dir = os.path.join(base_dir, 'cache_data')
@@ -87,7 +92,7 @@ def compute_author_degrees(base_dir, network, recsys, run, by='id'):
 
 def pids_to_list(pids_str):
     try:
-        pids = [int(x) for x in pids_str.split("|")]
+        pids = [x for x in pids_str.split("|")]
         return pids 
     except ValueError:
         pass 
