@@ -19,6 +19,11 @@ from utils_figures import *
 
 matplotlib.use('Agg') 
 
+BASE_DIR = "data"
+NETWORKS = ['BA', 'ER']
+RECSYSS = ['F', 'RC']
+RUNS = list(range(10))
+
 
 # ============================================
 # RUN FUNCTIONS
@@ -137,10 +142,10 @@ def agg_runs(run_func, n_bins=20):
 if __name__ == "__main__":
 
     old_stdout = sys.stdout
-    log_file = open("res/recs_distribution.log","w")
+    log_file = open("logs/recs_distribution.log","a")
     sys.stdout = log_file
 
-    print("Starting Analysis Pipeline...")
+    print(f"Starting Analysis Pipeline for data in {BASE_DIR}...")
 
     post_metrics = agg_runs(run_post_analysis, n_bins=20)
     user_metrics = agg_runs(run_user_analysis, n_bins=20)
@@ -148,7 +153,7 @@ if __name__ == "__main__":
     plot_recommendations_loglog(post_metrics, networks=['ER','BA'], save_path='figs/recommendations/posts/', analysis_type='post')
     plot_recommendations_loglog(user_metrics, networks=['ER','BA'], save_path='figs/recommendations/users/', analysis_type='user')
 
-    print("Analysis Completed.")
+    print(f"Completed Analysis Pipeline for data in {BASE_DIR}...")
 
     sys.stdout = old_stdout
     log_file.close()
