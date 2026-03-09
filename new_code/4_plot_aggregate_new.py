@@ -107,6 +107,7 @@ def plot_mean_distribution(base_name: str, res_dir: str) -> bool:
             low = np.array(data.get("low", []), dtype=float)
             high = np.array(data.get("high", []), dtype=float)
 
+            valid = np.isfinite(x) & np.isfinite(y) & np.isfinite(std) & (x > 0)
             valid &= (y - low) > 0
             if not np.any(valid):
                 continue
