@@ -13,7 +13,6 @@ env/
 # --- Data Folders (The heavy stuff) ---
 # Ignore the raw experiment data folders
 old_data/
-data/
 
 # Ignore processed data pickles
 processed_data/
