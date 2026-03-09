@@ -14,6 +14,10 @@ def get_db_path(base_dir, network, recsys, run):
         return os.path.join(base_dir, f"{network}_{recsys}_{run}.db")
     elif base_dir == 'old_data':
         return os.path.join(base_dir, f"{network}_{recsys}_{run}", "database_server.db")
+    elif base_dir.split('/')[-1] == 'old_data':
+        return os.path.join(base_dir, f"{network}_{recsys}_{run}", "database_server.db")
+    elif base_dir.split('/')[-1] == 'data':
+        return os.path.join(base_dir, f"{network}_{recsys}_{run}.db")
     else:
         raise ValueError(f"Unknown base_dir: {base_dir}")
 
@@ -45,20 +49,25 @@ def compute_author_degrees(base_dir, network, recsys, run, by='id'):
         Mapping of user_id or username -> degree
     """
 
-    db_path = get_db_path(base_dir, network, recsys, run)
-    run_folder = os.path.dirname(db_path)
-    csv_files = glob.glob(os.path.join(run_folder, "*.csv"))
-
-    if not csv_files:
-        print(f"No edge CSV found for {network}-{recsys}-{run}")
-        return {}
+    if base_dir == 'old_data' or base_dir.split('/')[-1] == 'old_data':
+        db_path = get_db_path(base_dir, network, recsys, run)
+        run_folder = os.path.dirname(db_path)
+        csv_files = glob.glob(os.path.join(run_folder, "*.csv"))
+        try:
+            df_edges = pd.read_csv(csv_files[0], header=None, names=['source', 'target'])
+        except Exception as e:
+            print(f"Error reading edge CSV: {e}")
+            return None
+    elif base_dir == 'data' or base_dir.split('/')[-1] == 'data':
+        db_path = get_db_path(base_dir, network, recsys, run)
+        csv_file = os.path.join(base_dir, f"{network}_{recsys}_{run}.csv")
+        try:
+            df_edges = pd.read_csv(csv_file, header=None, names=['source', 'target'])
+        except Exception as e:
+            print(f"Error reading edge CSV: {e}")
+            return None
 
     # --- read edges and compute degrees ---
-    try:
-        df_edges = pd.read_csv(csv_files[0], header=None, names=['source', 'target'])
-    except Exception as e:
-        print(f"Error reading edge CSV: {e}")
-        return {}
 
     deg_counts = pd.concat([df_edges['source'], df_edges['target']]).value_counts()
     degrees = {k: int(v / 2) for k, v in deg_counts.to_dict().items()}
@@ -92,10 +101,27 @@ def compute_author_degrees(base_dir, network, recsys, run, by='id'):
 
 def pids_to_list(pids_str):
     try:
-        pids = [x for x in pids_str.split("|")]
+        pids = [int(x) for x in pids_str.split("|")]
         return pids 
     except ValueError:
-        pass 
+        pids = pids_str.split("|")
+        return pids 
+    
+def post_id_mapping(base_dir, network, recsys, run):
+    if base_dir == 'data':
+        db_path = os.path.join(base_dir, f"{network}_{recsys}_{run}.db")
+        with sqlite3.connect(db_path) as conn:
+            df_posts = pd.read_sql("SELECT id AS post_id, user_id AS author_id FROM post", conn)
+            post_ids_unique = sorted(df_posts['post_id'].unique())
+            post_id_map = {pid: idx for idx, pid in enumerate(post_ids_unique)}
+            return post_id_map
+    else:
+        db_path = os.path.join(base_dir, f"{network}_{recsys}_{run}", "database_server.db")
+        with sqlite3.connect(db_path) as conn:
+            df_posts = pd.read_sql("SELECT id AS post_id, user_id AS author_id FROM post", conn)
+            post_ids_unique = sorted(df_posts['post_id'].unique())
+            post_id_map = {pid: idx for idx, pid in enumerate(post_ids_unique)}
+            return post_id_map
 
 def compute_delta_recs(df_rec: pd.DataFrame, all_users: list) -> pd.Series:
     """

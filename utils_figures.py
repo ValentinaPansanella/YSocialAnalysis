@@ -160,24 +160,22 @@ def plot_recommendations_loglog(
             mean_dist = data['mean']
             std_dist = data['std']
             bin_centers = (bins[:-1] + bins[1:]) / 2
-            
-            mask = mean_dist > 0
-            bin_centers_plot = bin_centers[mask]
-            mean_plot = mean_dist[mask]
-            std_plot = std_dist[mask]
 
             # Clip lower error for log scale
-            yerr_lower = np.minimum(std_plot, mean_plot * 0.9)
-            yerr = [yerr_lower, std_plot]
+            yerr_lower = np.minimum(std_dist, mean_dist * 0.9)
+            yerr = [yerr_lower, std_dist]
+            
+            print(len(bin_centers), len(mean_dist))
 
-            ax.errorbar(bin_centers_plot, mean_plot, yerr=yerr, fmt='o', capsize=3, label=recsys)
+            mask = mean_dist > 0
+            ax.errorbar(bins[mask], mean_dist[mask], yerr=std_dist[mask], fmt='o', capsize=3, label=recsys)
 
         ax.set_xscale('log')
         ax.set_yscale('log')
         ax.set_xlabel(x_label)
         ax.set_title(f"Network: {network}")
-        ax.set_xlim(1, max(bin_centers_plot)+200)
-        ax.set_ylim(min(mean_plot), max(mean_plot)*10)
+        ax.set_xlim(1, max(bins[mask])+200)
+        ax.set_ylim(min(mean_dist[mask]), max(mean_dist[mask])*10)
         ax.grid(True, which="both", ls="--", alpha=0.5)
         ax.legend()
     
@@ -240,7 +238,9 @@ def plot_recs_vs_degree(
                 bin_centers = 0.5 * (bins[:-1] + bins[1:])
                 mask = ~np.isnan(mean_curve)
                 x = bin_centers[mask]
+                print('x:', x)
                 y = mean_curve[mask]
+                print('y:', y)
                 yerr_std = std_curve[mask]
 
                 if len(x) == 0:
